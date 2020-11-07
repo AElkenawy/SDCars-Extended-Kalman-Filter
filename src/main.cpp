@@ -40,6 +40,7 @@ int main() {
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
 
+  // Pointers passed as arguments into the header
   h.onMessage([&fusionEKF,&tools,&estimations,&ground_truth]
               (uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                uWS::OpCode opCode) {
@@ -54,10 +55,14 @@ int main() {
 
         string event = j[0].get<string>();
         
+//      INPUT: values provided by the simulator to the c++ program
+//      ["sensor_measurement"] => the measurement that the simulator observed (either lidar or radar)
+
         if (event == "telemetry") {
           // j[1] is the data JSON object
           string sensor_measurement = j[1]["sensor_measurement"];
           
+          // Creating MeasurementPackage instance
           MeasurementPackage meas_package;
           std::istringstream iss(sensor_measurement);
           
@@ -66,7 +71,8 @@ int main() {
           // reads first element from the current line
           string sensor_type;
           iss >> sensor_type;
-
+          
+          // reading lidar data from synthetic input file
           if (sensor_type.compare("L") == 0) {
             meas_package.sensor_type_ = MeasurementPackage::LASER;
             meas_package.raw_measurements_ = VectorXd(2);
@@ -78,6 +84,7 @@ int main() {
             iss >> timestamp;
             meas_package.timestamp_ = timestamp;
           } else if (sensor_type.compare("R") == 0) {
+           // reading Radar data from synthetic input file
             meas_package.sensor_type_ = MeasurementPackage::RADAR;
             meas_package.raw_measurements_ = VectorXd(3);
             float ro;
@@ -99,7 +106,7 @@ int main() {
           iss >> y_gt;
           iss >> vx_gt;
           iss >> vy_gt;
-
+		  //Ground truth values reading
           VectorXd gt_values(4);
           gt_values(0) = x_gt;
           gt_values(1) = y_gt; 
@@ -108,6 +115,7 @@ int main() {
           ground_truth.push_back(gt_values);
           
           // Call ProcessMeasurement(meas_package) for Kalman filter
+          // Responsible for initialization, calling predict and update
           fusionEKF.ProcessMeasurement(meas_package);       
 
           // Push the current estimated x,y positon from the Kalman filter's 
@@ -126,8 +134,12 @@ int main() {
           estimate(3) = v2;
         
           estimations.push_back(estimate);
-
+        //compute RMSE
           VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
+          
+// 		  OUTPUT: values provided by the c++ program to the simulator
+// 		  ["estimate_x"], ["estimate_y"],["rmse_x"],["rmse_y"]
+// 		  ["rmse_vx"],["rmse_vy"]
 
           json msgJson;
           msgJson["estimate_x"] = p_x;
