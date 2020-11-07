@@ -7,10 +7,10 @@ Implementation of Extended Kalman Filter state estimator for a moving vehicle. S
 ## Project steps
 
 1. Process motion model: The motion model describes the motion (or the change) of the system’s state over one time sample. Constant velocity motion model is chosen.
-<img src="./imgs/1_motion_model" alt="transition matrix" width="450" height="250">
+<img src="./imgs/1_motion_model.PNG" alt="transition matrix" width="250" height="120">
 
 2. Measurement model: The measurement model performs the mapping between the measured values from sensors and estimated states of the system. Non-linear measurement function h(x ́) is a conversion between cartesian and polar coordinates of Radar.
-<img src="./imgs/2_radar_measure_matrix" alt="measurement funtion" width="450" height="250"> 
+<img src="./imgs/2_radar_measure_matrix.PNG" alt="measurement funtion" width="180" height="120"> 
 
 3. State estimation algorithm (KF and EKF): The prediction step is done using the Predict method `KalmanFilter::Predict()` of the `class KalmanFilter` . Lidar is using the KF update equations for the update step  `KalmanFilter::Update(const VectorXd &z)`, while Radar is using the EKF update equations `KalmanFilter::UpdateEKF(const VectorXd &z)`.
 
@@ -25,7 +25,8 @@ Implementation of Extended Kalman Filter state estimator for a moving vehicle. S
     | vy | 0.4541 |  0.4728  |
 
 A zoomed out view in the simulator of the  first dataset
-<img src="./imgs/3_dataset1_simulator.png" alt="first dataset" width="450" height="250">
+
+<img src="./imgs/3_dataset1_simulator.PNG" alt="first dataset" width="450" height="250">
 
 
 
@@ -38,6 +39,7 @@ A comparison between fused and individual sensor data for the second dataset:
 |py | 0.0967  | 0.1257  |0.3843  |
 | vx | 0.4441 |0.6458  |0.6608  |
 | vy |  0.4728  |0.5619 |0.8650  |
+
 Using a sensor fusion algorithm would result in a better estimation quality compared to any sensor individually. The Lidar can capture good estimation of coordinates _p_x_ and _p_y_ while Radar estimation is not good because of poor coordinates estimation quality which affects the rest of states estimation.
 
 ## Other Important Dependencies
